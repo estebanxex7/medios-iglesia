@@ -1,0 +1,11 @@
+{
+  "name": "Medios Iglesia",
+  "short_name": "Medios Iglesia",
+  "description": "Gestión del equipo de medios de la iglesia",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080a09",
+  "theme_color": "#080a09",
+  "orientation": "portrait-primary"
+}

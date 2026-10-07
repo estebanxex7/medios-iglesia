@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta name="theme-color" content="#080a09">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Medios Iglesia">
+
+<link rel="manifest" href="manifest.json">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Medios Iglesia</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- =====================================================
+     LOGIN
+===================================================== -->
+
+<div id="pantalla-login" class="pantalla-auth">
+
+    <div class="auth-card">
+
+        <div class="auth-logo">
+            <div class="logo-marca">MI</div>
+            <h1>Medios Iglesia</h1>
+            <p>Gestión del equipo de medios</p>
+        </div>
+
+        <form id="form-login">
+
+            <div class="campo">
+                <label>Usuario</label>
+                <input
+                    type="text"
+                    id="login-usuario"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label>Contraseña</label>
+                <input
+                    type="password"
+                    id="login-password"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn btn-principal">
+                Iniciar sesión
+            </button>
+
+        </form>
+
+        <button
+            type="button"
+            class="btn btn-secundario btn-full"
+            data-action="mostrar-registro"
+        >
+            Crear cuenta
+        </button>
+
+        <div id="login-mensaje" class="mensaje-auth"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     REGISTRO
+===================================================== -->
+
+<div id="pantalla-registro" class="pantalla-auth oculta">
+
+    <div class="auth-card">
+
+        <div class="auth-logo">
+            <div class="logo-marca">MI</div>
+            <h1>Crear cuenta</h1>
+            <p>Solicita acceso a Medios Iglesia</p>
+        </div>
+
+        <form id="form-registro">
+
+            <div class="campo">
+                <label>Nombre completo</label>
+                <input
+                    type="text"
+                    id="registro-nombre"
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label>Usuario</label>
+                <input
+                    type="text"
+                    id="registro-usuario"
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label>Contraseña</label>
+                <input
+                    type="password"
+                    id="registro-password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn btn-principal">
+                Solicitar registro
+            </button>
+
+        </form>
+
+        <button
+            type="button"
+            class="btn btn-secundario btn-full"
+            data-action="mostrar-login"
+        >
+            Volver al inicio
+        </button>
+
+        <div id="registro-mensaje" class="mensaje-auth"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     APP
+===================================================== -->
+
+<div id="app" class="app oculta">
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div class="header-izquierda">
+
+            <button
+                type="button"
+                class="btn-menu"
+                data-action="toggle-sidebar"
+            >
+                ☰
+            </button>
+
+            <div>
+                <strong>Medios Iglesia</strong>
+                <span id="header-usuario">Esteban</span>
+            </div>
+
+        </div>
+
+        <button
+            type="button"
+            class="btn-salir"
+            data-action="cerrar-sesion"
+        >
+            Salir
+        </button>
+
+    </header>
+
+
+    <!-- SIDEBAR -->
+
+    <aside id="sidebar" class="sidebar">
+
+        <div class="sidebar-logo">
+            <div class="logo-marca">MI</div>
+            <div>
+                <strong>Medios Iglesia</strong>
+                <small>MAVI</small>
+            </div>
+        </div>
+
+        <nav>
+
+            <button class="nav-btn activo" data-section="inicio">
+                🏠 <span>Inicio</span>
+            </button>
+
+            <button class="nav-btn" data-section="personas">
+                👥 <span>Personas</span>
+            </button>
+
+            <button class="nav-btn" data-section="areas">
+                🎛️ <span>Áreas</span>
+            </button>
+
+            <button class="nav-btn" data-section="servicios">
+                ⛪ <span>Cultos</span>
+            </button>
+
+            <button class="nav-btn" data-section="calendario">
+                📅 <span>Calendario</span>
+            </button>
+
+            <button class="nav-btn" data-section="asignaciones">
+                📋 <span>Asignaciones</span>
+            </button>
+
+            <button class="nav-btn" data-section="privilegios">
+                ⭐ <span>Privilegios</span>
+            </button>
+
+            <button class="nav-btn" data-section="publicacion">
+                📢 <span>Publicación</span>
+            </button>
+
+            <button class="nav-btn" data-section="perfil">
+                ⚙️ <span>Perfil</span>
+            </button>
+
+            <button
+                class="nav-btn solo-admin"
+                data-section="cuentas"
+            >
+                🔐 <span>Cuentas</span>
+            </button>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- CONTENIDO -->
+
+    <main class="contenido">
+
+
+        <!-- =================================================
+             INICIO
+        ================================================== -->
+
+        <section id="seccion-inicio" class="seccion activa">
+
+            <div class="titulo-seccion">
+
+                <div>
+                    <span class="eyebrow">PANEL PRINCIPAL</span>
+                    <h1>Inicio</h1>
+                    <p>Bienvenido a Medios Iglesia.</p>
+                </div>
+
+            </div>
+
+
+            <div class="bienvenida-card">
+
+                <div>
+                    <span class="eyebrow">BIENVENIDO</span>
+                    <h2 id="inicio-nombre">Esteban</h2>
+                    <p id="inicio-rol">Administrador</p>
+                </div>
+
+                <div class="bienvenida-icono">
+                    ⛪
+                </div>
+
+            </div>
+
+
+            <!-- PRIVILEGIO -->
+
+            <div class="bloque">
+
+                <div class="bloque-header">
+
+                    <div>
+                        <span class="eyebrow">SERVICIO</span>
+                        <h2>Mis próximos privilegios</h2>
+                    </div>
+
+                </div>
+
+                <div id="inicio-privilegios" class="grid-cards">
+                </div>
+
+            </div>
+
+
+            <!-- RESUMEN -->
+
+            <div class="grid-resumen">
+
+                <div class="resumen-card">
+                    <span>👥</span>
+                    <div>
+                        <strong id="resumen-personas">0</strong>
+                        <small>Personas</small>
+                    </div>
+                </div>
+
+                <div class="resumen-card">
+                    <span>🎛️</span>
+                    <div>
+                        <strong id="resumen-areas">0</strong>
+                        <small>Áreas</small>
+                    </div>
+                </div>
+
+                <div class="resumen-card">
+                    <span>📅</span>
+                    <div>
+                        <strong id="resumen-servicios">0</strong>
+                        <small>Próximos cultos</small>
+                    </div>
+                </div>
+
+                <div class="resumen-card">
+                    <span>📋</span>
+                    <div>
+                        <strong id="resumen-asignaciones">0</strong>
+                        <small>Asignaciones</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PERSONAS
+        ================================================== -->
+
+        <section id="seccion-personas" class="seccion">
+
+            <div class="titulo-seccion">
+
+                <div>
+                    <span class="eyebrow">EQUIPO</span>
+                    <h1>Personas</h1>
+                    <p>Gestiona los integrantes del equipo.</p>
+                </div>
+
+                <button
+                    class="btn btn-principal solo-admin"
+                    data-action="agregar-persona"
+                >
+                    + Agregar persona
+                </button>
+
+            </div>
+
+            <div id="lista-personas" class="lista">
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             AREAS
+        ================================================== -->
+
+        <section id="seccion-areas" class="seccion">
+
+            <div class="titulo-seccion">
+
+                <div>
+                    <span class="eyebrow">FUNCIONES</span>
+                    <h1>Áreas</h1>
+                    <p>Áreas disponibles para servir.</p>
+                </div>
+
+                <button
+                    class="btn btn-principal solo-admin"
+                    data-action="agregar-area"
+                >
+                    + Agregar área
+                </button>
+
+            </div>
+
+            <div id="lista-areas" class="grid-cards">
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CULTOS
+        ================================================== -->
+
+        <section id="seccion-servicios" class="seccion">
+
+            <div class="titulo-seccion">
+
+                <div>
+                    <span class="eyebrow">REUNIONES</span>
+                    <h1>Cultos</h1>
+                    <p>Servicios programados de la iglesia.</p>
+                </div>
+
+                <button
+                    class="btn btn-principal solo-admin"
+                    data-action="agregar-servicio"
+                >
+                    + Agregar culto
+                </button>
+
+            </div>
+
+            <div id="lista-servicios" class="lista">
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CALENDARIO
+        ================================================== -->
+
+        <section id="seccion-calendario" class="seccion">
+
+            <div class="titulo-seccion">
+
+                <div>
+                    <span class="eyebrow">AGENDA</span>
+                    <h1>Calendario</h1>
+                    <p>Cultos y privilegios asignados.</p>
+                </div>
+
+            </div>
+
+            <div class="calendario-controles">
+
+                <button
+                    class="btn btn-secundario"
+                    data-action="mes-anterior"
+                >
+                    ←
+                </button>
+
+                <h2 id="calendario-mes"></h2>
+
+                <button
+                    class="btn btn-secundario"
+                    data-action="mes-siguiente"
+                >
+                    →
+                </button>
+
+            </div>
+
+            <div id="calendario" class="calendario">
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ASIGNACIONES
+        ================================================== -->
+
+        <section id="seccion-asignaciones" class="seccion">
+
+            <div class="titulo-seccion">
+
+                <div>
+                    <span class="eyebrow">ORGANIZACIÓN</span>
+                    <h1>Asignaciones</h1>
+                    <p>Asigna privilegios a los servidores.</p>
+                </div>
+
+                <button
+                    class="btn btn-principal solo-admin"
+                    data-action="agregar-asignacion"
+                >
+                    + Nueva asignación
+                </button>
+
+            </div>
+
+            <div id="lista-asignaciones" class="lista">
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PRIVILEGIOS
+        ================================================== -->
+
+        <section id="seccion-privilegios" class="seccion">
+
+            <div class="titulo-seccion">
+
+                <div>
+                    <span class="eyebrow">SERVICIO</span>
+                    <h1>Privilegios</h1>
+                    <p>Consulta quién sirve en cada culto.</p>
+                </div>
+
+            </div>
+
+            <div id="lista-privilegios" class="lista">
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PUBLICACION
+        ================================================== -->
+
+        <section id="seccion-publicacion" class="seccion">
+
+            <div class="titulo-seccion">
+
+                <div>
+                    <span class="eyebrow">COMUNICACIÓN</span>
+                    <h1>Publicación</h1>
+                    <p>Publica el calendario del equipo.</p>
+                </div>
+
+            </div>
+
+            <div class="panel">
+
+                <div id="estado-publicacion"></div>
+
+                <button
+                    class="btn btn-principal solo-admin"
+                    data-action="publicar-calendario"
+                >
+                    📢 Publicar calendario
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PERFIL
+        ================================================== -->
+
+        <section id="seccion-perfil" class="seccion">
+
+            <div class="titulo-seccion">
+
+                <div>
+                    <span class="eyebrow">CUENTA</span>
+                    <h1>Perfil</h1>
+                </div>
+
+            </div>
+
+            <div id="perfil-contenido">
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CUENTAS
+        ================================================== -->
+
+        <section id="seccion-cuentas" class="seccion solo-admin">
+
+            <div class="titulo-seccion">
+
+                <div>
+                    <span class="eyebrow">ADMINISTRACIÓN</span>
+                    <h1>Cuentas</h1>
+                    <p>Solicitudes de registro pendientes.</p>
+                </div>
+
+            </div>
+
+            <div id="lista-cuentas">
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL
+===================================================== -->
+
+<div id="modal" class="modal oculta">
+
+    <div
+        class="modal-fondo"
+        data-action="cerrar-modal"
+    ></div>
+
+    <div class="modal-contenido">
+
+        <div class="modal-header">
+
+            <h3 id="modal-titulo">
+                Formulario
+            </h3>
+
+            <button
+                type="button"
+                class="modal-cerrar"
+                data-action="cerrar-modal"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div id="modal-cuerpo">
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     TOAST
+===================================================== -->
+
+<div id="toast" class="toast">
+</div>
+
+
+<!-- NAVEGACIÓN INFERIOR MÓVIL -->
+<nav class="mobile-bottom-nav" aria-label="Navegación móvil">
+
+    <button class="nav-btn mobile-nav-btn" data-section="inicio">
+        <span class="mobile-nav-icon">⌂</span>
+        <span>Inicio</span>
+    </button>
+
+    <button class="nav-btn mobile-nav-btn" data-section="calendario">
+        <span class="mobile-nav-icon">▣</span>
+        <span>Calendario</span>
+    </button>
+
+    <button class="nav-btn mobile-nav-btn" data-section="asignaciones">
+        <span class="mobile-nav-icon">✓</span>
+        <span>Asignaciones</span>
+    </button>
+
+    <button class="nav-btn mobile-nav-btn" data-section="privilegios">
+        <span class="mobile-nav-icon">★</span>
+        <span>Privilegios</span>
+    </button>
+
+    <button class="nav-btn mobile-nav-btn" data-section="perfil">
+        <span class="mobile-nav-icon">⚙</span>
+        <span>Perfil</span>
+    </button>
+
+</nav>
+
+
+
+
+<script src="app.js"></script>
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js")
+            .then(() => {
+                console.log("Service Worker registrado correctamente");
+            })
+            .catch(error => {
+                console.error("Error registrando Service Worker:", error);
+            });
+    });
+}
+</script>
+
+</body>
+</html>
