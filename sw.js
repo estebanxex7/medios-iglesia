@@ -1,13 +1,14 @@
-const CACHE_NAME = "medios-iglesia-v1";
+const CACHE_NAME = "medios-iglesia-v2";
 
 const ARCHIVOS = [
     "./",
     "./index.html",
     "./style.css",
     "./app.js",
-    "./manifest.json"
+    "./manifest.json",
+    "./icon-192.png",
+    "./icon-512.png"
 ];
-
 self.addEventListener("install", event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
