@@ -1,25 +1,26 @@
 {
+  "id": "/medios-iglesia/index.html",
   "name": "Medios Iglesia",
   "short_name": "Medios Iglesia",
   "description": "Gestión del equipo de medios de la iglesia",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "/medios-iglesia/",
+  "scope": "/medios-iglesia/",
   "display": "standalone",
   "background_color": "#080a09",
   "theme_color": "#080a09",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "./icon-192.png",
+      "src": "/medios-iglesia/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "./icon-512.png",
+      "src": "/medios-iglesia/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
