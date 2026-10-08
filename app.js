@@ -1754,7 +1754,7 @@ function abrirFormularioPersona(id = null) {
 }
 
 
-```js
+
 async function guardarPersona(evento) {
 
     evento.preventDefault();
