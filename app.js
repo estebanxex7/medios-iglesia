@@ -3152,7 +3152,7 @@ function abrirFormularioAsignacion() {
 }
 
 
-function guardarAsignacion(evento) {
+async function guardarAsignacion(evento) {
 
     evento.preventDefault();
 
@@ -3200,13 +3200,57 @@ function guardarAsignacion(evento) {
         return;
     }
 
+    const area =
+        estado.areas.find(
+            a =>
+                a.nombre === funcion
+        );
+
+    if (!area) {
+
+        mostrarToast(
+            "No se encontró el área seleccionada."
+        );
+
+        return;
+    }
+
+    const { data, error } =
+        await supabaseClient
+            .from("asignaciones")
+            .insert({
+                servicio_id: servicioId,
+                persona_id: personaId,
+                area_id: area.id,
+                estado: "pendiente",
+                reemplazo_persona_id: null
+            })
+            .select()
+            .single();
+
+    if (error) {
+
+        console.error(
+            "Error guardando asignación en Supabase:",
+            error
+        );
+
+        mostrarToast(
+            "No se pudo guardar la asignación."
+        );
+
+        return;
+    }
+
     estado.asignaciones.push({
 
-        id: idUnico("asignacion"),
+        id: data.id,
 
-        servicioId,
+        servicioId:
+            data.servicio_id,
 
-        personaId,
+        personaId:
+            data.persona_id,
 
         funcion,
 
@@ -4676,6 +4720,7 @@ document.addEventListener(
 
         console.log("PASO 7");
 
-       await cargarAsignacionesDesdeSupabase();
+        await cargarAsignacionesDesdeSupabase();
+
     }
 );
