@@ -4674,8 +4674,8 @@ document.addEventListener(
 
         await sincronizarServiciosConSupabase();
 
-        await cargarAsignacionesDesdeSupabase();
-
         console.log("PASO 7");
+
+       await cargarAsignacionesDesdeSupabase();
     }
 );
