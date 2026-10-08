@@ -2753,6 +2753,85 @@ function eliminarServicio(id) {
 }
 
 
+async function cargarAsignacionesDesdeSupabase() {
+
+    const { data, error } =
+        await supabaseClient
+            .from("asignaciones")
+            .select("*")
+            .order("created_at", {
+                ascending: true
+            });
+
+    if (error) {
+
+        console.error(
+            "Error cargando asignaciones desde Supabase:",
+            error
+        );
+
+        return;
+    }
+
+    estado.asignaciones =
+        (data || []).map(asignacion => {
+
+            const area =
+                estado.areas.find(
+                    area =>
+                        area.id ===
+                        asignacion.area_id
+                );
+
+            return {
+
+                id: asignacion.id,
+
+                servicioId:
+                    asignacion.servicio_id,
+
+                personaId:
+                    asignacion.persona_id,
+
+                funcion:
+                    area
+                        ? area.nombre
+                        : "",
+
+                asistencia:
+                    asignacion.estado ===
+                    "confirmado"
+                        ? "confirmado"
+                        : asignacion.estado ===
+                          "no_asistira"
+                            ? "no_asistira"
+                            : "pendiente",
+
+                reemplazoEstado:
+                    asignacion.reemplazo_persona_id
+                        ? "encontrado"
+                        : "ninguno",
+
+                reemplazoPersonaId:
+                    asignacion.reemplazo_persona_id ||
+                    null,
+
+                esReemplazo: false,
+
+                reemplazaAsignacionId:
+                    null
+            };
+        });
+
+    console.log(
+        "Asignaciones cargadas desde Supabase:",
+        estado.asignaciones
+    );
+}
+
+
+
+
 /* =========================================================
    ASIGNACIONES
 ========================================================= */
@@ -4594,6 +4673,8 @@ document.addEventListener(
         console.log("Voy a sincronizar servicios");
 
         await sincronizarServiciosConSupabase();
+
+        await cargarAsignacionesDesdeSupabase();
 
         console.log("PASO 7");
     }
