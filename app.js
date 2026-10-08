@@ -2060,7 +2060,7 @@ async function guardarPersona(evento) {
         "Persona guardada correctamente."
     );
 }
-```
+
 
 
 function eliminarPersona(id) {
