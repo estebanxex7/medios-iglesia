@@ -4510,17 +4510,10 @@ function actualizarResumen() {
 document.addEventListener(
     "DOMContentLoaded",
     async () => {
-
         cargarEstado();
-
         configurarEventos();
-
         recuperarSesion();
-
         await cargarAreasDesdeSupabase();
-
         await cargarPersonasDesdeSupabase();
-
-        renderizarTodo();
     }
 );
