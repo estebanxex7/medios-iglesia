@@ -8,6 +8,25 @@
    CONFIGURACIÓN
 ========================================================= */
 
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL = "https://derrrsjvymbnvqgsnaxv.supabase.co";
+
+const SUPABASE_ANON_KEY =
+    "sb_publishable_P9BhDSgqnOimC5RNVi2Nkg_y2vpcFWw";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
+
+console.log("Supabase conectado:", SUPABASE_URL);
+
+
+
+
 const STORAGE_KEY = "medios_iglesia_final";
 
 const USUARIO_INICIAL = {
@@ -179,6 +198,42 @@ function cargarEstado() {
 
         crearEstadoInicial();
     }
+}
+
+
+async function cargarAreasDesdeSupabase() {
+
+    const { data, error } =
+        await supabaseClient
+            .from("areas")
+            .select("id, nombre, activo")
+            .eq("activo", true)
+            .order("nombre");
+
+    if (error) {
+
+        console.error(
+            "Error cargando áreas desde Supabase:",
+            error
+        );
+
+        return;
+    }
+
+    if (!Array.isArray(data)) {
+        return;
+    }
+
+    estado.areas = data.map(area => ({
+        id: area.id,
+        nombre: area.nombre,
+        activo: area.activo
+    }));
+
+    console.log(
+        "Áreas cargadas desde Supabase:",
+        estado.areas
+    );
 }
 
 
@@ -606,31 +661,77 @@ function textoEstado(asignacion) {
    LOGIN
 ========================================================= */
 
-function iniciarSesion(usuario, password) {
+async function iniciarSesion(usuario, password) {
 
-    const encontrado =
-        estado.usuarios.find(
-            u =>
-                u.username.toLowerCase() ===
-                    usuario.toLowerCase() &&
-                u.password === password &&
-                u.activo === true
-        );
+    const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+            email: usuario.trim(),
+            password: password
+        });
 
-    if (!encontrado) {
+    if (error) {
+
+        console.error("Error de inicio de sesión:", error);
 
         mostrarMensajeLogin(
-            "Usuario o contraseña incorrectos."
+            "Correo o contraseña incorrectos."
         );
 
         return;
     }
 
-    usuarioActual = encontrado;
+    const { data: perfil, error: errorPerfil } =
+        await supabaseClient
+            .from("perfiles")
+            .select(`
+                id,
+                persona_id,
+                rol,
+                nombre,
+                activo
+            `)
+            .eq("id", data.user.id)
+            .single();
+
+    if (errorPerfil || !perfil) {
+
+        console.error(
+            "No se encontró el perfil:",
+            errorPerfil
+        );
+
+        await supabaseClient.auth.signOut();
+
+        mostrarMensajeLogin(
+            "No se encontró el perfil de este usuario."
+        );
+
+        return;
+    }
+
+    if (perfil.activo !== true) {
+
+        await supabaseClient.auth.signOut();
+
+        mostrarMensajeLogin(
+            "Esta cuenta está desactivada."
+        );
+
+        return;
+    }
+
+    usuarioActual = {
+        id: perfil.id,
+        personaId: perfil.persona_id,
+        nombre: perfil.nombre,
+        username: usuario.trim(),
+        rol: perfil.rol,
+        activo: perfil.activo
+    };
 
     localStorage.setItem(
         "medios_iglesia_sesion",
-        encontrado.id
+        usuarioActual.id
     );
 
     mostrarApp();
@@ -1575,36 +1676,45 @@ function abrirFormularioPersona(id = null) {
 
                         ${
                             estado.areas
-                                .map(area => `
+                                .map(area => {
 
-                                    <label
-                                        style="
-                                            display:flex;
-                                            gap:8px;
-                                            align-items:center;
-                                            margin:0;
-                                        "
-                                    >
+                                    const nombreArea =
+                                        typeof area === "string"
+                                            ? area
+                                            : area.nombre;
 
-                                        <input
-                                            type="checkbox"
-                                            name="persona-area"
-                                            value="${escapar(area.nombre)}"
-                                            ${
-                                                persona?.areas?.includes(area.nombre)
-                                                    ? "checked"
-                                                    : ""
-                                            }
+                                    return `
+
+                                        <label
+                                            style="
+                                                display:flex;
+                                                gap:8px;
+                                                align-items:center;
+                                                margin:0;
+                                            "
                                         >
 
-                                        <span>
-                                            ${iconoFuncion(area.nombre)}
-                                            ${escapar(area.nombre)}
-                                        </span>
+                                            <input
+                                                type="checkbox"
+                                                name="persona-area"
+                                                value="${escapar(nombreArea)}"
+                                                ${
+                                                    persona?.areas?.includes(nombreArea)
+                                                        ? "checked"
+                                                        : ""
+                                                }
+                                            >
 
-                                    </label>
+                                            <span>
+                                                ${iconoFuncion(nombreArea)}
+                                                ${escapar(nombreArea)}
+                                            </span>
 
-                                `)
+                                        </label>
+
+                                    `;
+
+                                })
                                 .join("")
                         }
 
@@ -1644,7 +1754,8 @@ function abrirFormularioPersona(id = null) {
 }
 
 
-function guardarPersona(evento) {
+```js
+async function guardarPersona(evento) {
 
     evento.preventDefault();
 
@@ -1663,43 +1774,281 @@ function guardarPersona(evento) {
             "persona-rol"
         ).value;
 
-    const areas =
+    const areasSeleccionadasNombres =
         [...document.querySelectorAll(
             'input[name="persona-area"]:checked'
         )].map(
-            input => input.value
+            input => input.value.trim()
         );
 
     if (!nombre) {
-        mostrarToast("Escribe el nombre.");
+
+        mostrarToast(
+            "Escribe el nombre."
+        );
+
         return;
     }
+
+
+    /* =====================================================
+       OBTENER ÁREAS DIRECTAMENTE DESDE SUPABASE
+    ===================================================== */
+
+    const { data: areasSupabase, error: errorAreasSupabase } =
+        await supabaseClient
+            .from("areas")
+            .select("id, nombre, activo")
+            .eq("activo", true);
+
+    if (errorAreasSupabase) {
+
+        console.error(
+            "Error obteniendo áreas desde Supabase:",
+            errorAreasSupabase
+        );
+
+        mostrarToast(
+            "No se pudieron cargar las áreas."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       CONVERTIR NOMBRES SELECCIONADOS A IDs
+    ===================================================== */
+
+    const areasSeleccionadas =
+        (areasSupabase || []).filter(area =>
+            areasSeleccionadasNombres.some(
+                nombreArea =>
+                    nombreArea.trim() ===
+                    area.nombre.trim()
+            )
+        );
+
+
+    console.log(
+        "Áreas seleccionadas:",
+        areasSeleccionadasNombres
+    );
+
+    console.log(
+        "Áreas encontradas en Supabase:",
+        areasSeleccionadas
+    );
+
+
+    /* =====================================================
+       EDITAR PERSONA
+    ===================================================== */
 
     if (id) {
 
         const persona =
             buscarPersona(id);
 
-        if (persona) {
+        if (!persona) {
 
-            persona.nombre = nombre;
-            persona.rol = rol;
-            persona.areas = areas;
+            mostrarToast(
+                "No se encontró la persona."
+            );
+
+            return;
         }
 
-    } else {
+
+        /* =================================================
+           ACTUALIZAR PERSONA
+        ================================================= */
+
+        const { error } =
+            await supabaseClient
+                .from("personas")
+                .update({
+                    nombre: nombre,
+                    rol: rol,
+                    activo: true
+                })
+                .eq("id", id);
+
+        if (error) {
+
+            console.error(
+                "Error actualizando persona:",
+                error
+            );
+
+            mostrarToast(
+                "No se pudo actualizar la persona."
+            );
+
+            return;
+        }
+
+
+        /* =================================================
+           ELIMINAR RELACIONES ANTERIORES
+        ================================================= */
+
+        const { error: errorEliminarAreas } =
+            await supabaseClient
+                .from("persona_areas")
+                .delete()
+                .eq("persona_id", id);
+
+        if (errorEliminarAreas) {
+
+            console.error(
+                "Error eliminando áreas anteriores:",
+                errorEliminarAreas
+            );
+
+            mostrarToast(
+                "La persona se actualizó, pero no se pudieron actualizar sus áreas."
+            );
+
+            return;
+        }
+
+
+        /* =================================================
+           GUARDAR NUEVAS RELACIONES
+        ================================================= */
+
+        if (areasSeleccionadas.length > 0) {
+
+            const relaciones =
+                areasSeleccionadas.map(area => ({
+                    persona_id: id,
+                    area_id: area.id
+                }));
+
+            const { error: errorInsertAreas } =
+                await supabaseClient
+                    .from("persona_areas")
+                    .insert(relaciones);
+
+            if (errorInsertAreas) {
+
+                console.error(
+                    "Error guardando áreas:",
+                    errorInsertAreas
+                );
+
+                mostrarToast(
+                    "La persona se actualizó, pero no se pudieron guardar sus áreas."
+                );
+
+                return;
+            }
+        }
+
+
+        /* =================================================
+           ACTUALIZAR ESTADO LOCAL
+        ================================================= */
+
+        persona.nombre = nombre;
+        persona.rol = rol;
+        persona.areas =
+            areasSeleccionadas.map(
+                area => area.nombre
+            );
+
+    }
+
+
+    /* =====================================================
+       CREAR PERSONA
+    ===================================================== */
+
+    else {
+
+        const { data, error } =
+            await supabaseClient
+                .from("personas")
+                .insert({
+                    nombre: nombre,
+                    rol: rol,
+                    activo: true
+                })
+                .select()
+                .single();
+
+        if (error) {
+
+            console.error(
+                "Error creando persona:",
+                error
+            );
+
+            mostrarToast(
+                "No se pudo guardar la persona."
+            );
+
+            return;
+        }
+
+
+        /* =================================================
+           GUARDAR ÁREAS DE LA NUEVA PERSONA
+        ================================================= */
+
+        if (areasSeleccionadas.length > 0) {
+
+            const relaciones =
+                areasSeleccionadas.map(area => ({
+                    persona_id: data.id,
+                    area_id: area.id
+                }));
+
+            const { error: errorInsertAreas } =
+                await supabaseClient
+                    .from("persona_areas")
+                    .insert(relaciones);
+
+            if (errorInsertAreas) {
+
+                console.error(
+                    "Error guardando áreas:",
+                    errorInsertAreas
+                );
+
+                mostrarToast(
+                    "La persona se creó, pero no se pudieron guardar sus áreas."
+                );
+
+                return;
+            }
+        }
+
+
+        /* =================================================
+           ACTUALIZAR ESTADO LOCAL
+        ================================================= */
 
         estado.personas.push({
 
-            id: idUnico("persona"),
+            id: data.id,
 
-            nombre,
+            nombre: data.nombre,
 
-            rol,
+            rol: data.rol,
 
-            areas
+            areas:
+                areasSeleccionadas.map(
+                    area => area.nombre
+                )
         });
     }
+
+
+    /* =====================================================
+       FINALIZAR
+    ================================================= */
 
     guardarEstado();
 
@@ -1711,6 +2060,7 @@ function guardarPersona(evento) {
         "Persona guardada correctamente."
     );
 }
+```
 
 
 function eliminarPersona(id) {
@@ -4090,13 +4440,15 @@ function actualizarResumen() {
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
+    async () => {
 
         cargarEstado();
 
         configurarEventos();
 
         recuperarSesion();
+
+        await cargarAreasDesdeSupabase();
 
     }
 );
