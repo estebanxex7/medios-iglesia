@@ -4563,18 +4563,38 @@ function actualizarResumen() {
 document.addEventListener(
     "DOMContentLoaded",
     async () => {
+
+        console.log("PASO 1");
+
         cargarEstado();
+
+        console.log("PASO 2");
 
         configurarEventos();
 
+        console.log("PASO 3");
+
         recuperarSesion();
+
+        console.log("PASO 4");
 
         await cargarAreasDesdeSupabase();
 
+        console.log("PASO 5");
+
         await cargarPersonasDesdeSupabase();
 
-        console.log("Servicios antes de sincronizar:", estado.servicios);
+        console.log("PASO 6");
+
+        console.log(
+            "Servicios antes de sincronizar:",
+            estado.servicios
+        );
+
+        console.log("Voy a sincronizar servicios");
 
         await sincronizarServiciosConSupabase();
+
+        console.log("PASO 7");
     }
 );
