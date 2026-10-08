@@ -555,7 +555,7 @@ function asegurarServiciosGenerales() {
 }
 
 
-```js
+js
 async function sincronizarServiciosConSupabase() {
 
     if (!Array.isArray(estado.servicios)) {
@@ -620,7 +620,7 @@ async function sincronizarServiciosConSupabase() {
         estado.servicios
     );
 }
-```
+
 
 
 /* =========================================================
