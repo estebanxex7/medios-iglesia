@@ -237,6 +237,75 @@ async function cargarAreasDesdeSupabase() {
 }
 
 
+async function cargarPersonasDesdeSupabase() {
+
+    const { data: personas, error: errorPersonas } =
+        await supabaseClient
+            .from("personas")
+            .select("id, nombre, rol, activo")
+            .eq("activo", true)
+            .order("nombre");
+
+    if (errorPersonas) {
+        console.error(
+            "Error cargando personas desde Supabase:",
+            errorPersonas
+        );
+        return;
+    }
+
+    const { data: relaciones, error: errorRelaciones } =
+        await supabaseClient
+            .from("persona_areas")
+            .select("persona_id, area_id");
+
+    if (errorRelaciones) {
+        console.error(
+            "Error cargando áreas de personas:",
+            errorRelaciones
+        );
+        return;
+    }
+
+    estado.personas =
+        (personas || []).map(persona => {
+
+            const areasPersona =
+                (relaciones || [])
+                    .filter(
+                        relacion =>
+                            relacion.persona_id === persona.id
+                    )
+                    .map(relacion => {
+
+                        const area =
+                            estado.areas.find(
+                                area =>
+                                    area.id ===
+                                    relacion.area_id
+                            );
+
+                        return area
+                            ? area.nombre
+                            : null;
+                    })
+                    .filter(Boolean);
+
+            return {
+                id: persona.id,
+                nombre: persona.nombre,
+                rol: persona.rol,
+                areas: areasPersona
+            };
+        });
+
+    console.log(
+        "Personas cargadas desde Supabase:",
+        estado.personas
+    );
+}
+
+
 /* =========================================================
    ESTADO INICIAL
 ========================================================= */
@@ -4450,5 +4519,8 @@ document.addEventListener(
 
         await cargarAreasDesdeSupabase();
 
+        await cargarPersonasDesdeSupabase();
+
+        renderizarTodo();
     }
 );
