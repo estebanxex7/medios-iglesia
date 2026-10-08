@@ -555,7 +555,6 @@ function asegurarServiciosGenerales() {
 }
 
 
-js
 async function sincronizarServiciosConSupabase() {
 
     if (!Array.isArray(estado.servicios)) {
@@ -580,47 +579,33 @@ async function sincronizarServiciosConSupabase() {
             continue;
         }
 
-        let servicioSupabase = existente;
-
-        if (!servicioSupabase) {
-
-            const { data: nuevo, error: errorInsert } =
-                await supabaseClient
-                    .from("servicios")
-                    .insert({
-                        fecha: servicio.fecha,
-                        hora: servicio.hora,
-                        tipo: servicio.tipo || "general",
-                        nombre: servicio.nombre || "Culto",
-                        activo: true
-                    })
-                    .select("id")
-                    .single();
-
-            if (errorInsert) {
-                console.error(
-                    "Error guardando servicio en Supabase:",
-                    errorInsert
-                );
-                continue;
-            }
-
-            servicioSupabase = nuevo;
+        if (existente) {
+            continue;
         }
 
-        if (servicioSupabase?.id) {
-            servicio.id = servicioSupabase.id;
+        const { error: errorInsert } =
+            await supabaseClient
+                .from("servicios")
+                .insert({
+                    fecha: servicio.fecha,
+                    hora: servicio.hora,
+                    tipo: servicio.tipo || "general",
+                    nombre: servicio.nombre || "Culto",
+                    activo: true
+                });
+
+        if (errorInsert) {
+            console.error(
+                "Error guardando servicio en Supabase:",
+                errorInsert
+            );
         }
     }
 
-    guardarEstado();
-
     console.log(
-        "Servicios sincronizados con sus UUID de Supabase:",
-        estado.servicios
+        "Servicios sincronizados con Supabase."
     );
 }
-
 
 
 /* =========================================================
