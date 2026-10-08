@@ -555,6 +555,59 @@ function asegurarServiciosGenerales() {
 }
 
 
+async function sincronizarServiciosConSupabase() {
+
+    if (!Array.isArray(estado.servicios)) {
+        return;
+    }
+
+    for (const servicio of estado.servicios) {
+
+        const { data: existente, error: errorBusqueda } =
+            await supabaseClient
+                .from("servicios")
+                .select("id")
+                .eq("fecha", servicio.fecha)
+                .eq("hora", servicio.hora)
+                .maybeSingle();
+
+        if (errorBusqueda) {
+            console.error(
+                "Error buscando servicio en Supabase:",
+                errorBusqueda
+            );
+            continue;
+        }
+
+        if (existente) {
+            continue;
+        }
+
+        const { error: errorInsert } =
+            await supabaseClient
+                .from("servicios")
+                .insert({
+                    fecha: servicio.fecha,
+                    hora: servicio.hora,
+                    tipo: servicio.tipo || "general",
+                    nombre: servicio.nombre || "Culto",
+                    activo: true
+                });
+
+        if (errorInsert) {
+            console.error(
+                "Error guardando servicio en Supabase:",
+                errorInsert
+            );
+        }
+    }
+
+    console.log(
+        "Servicios sincronizados con Supabase."
+    );
+}
+
+
 /* =========================================================
    FECHAS
 ========================================================= */
@@ -4511,9 +4564,17 @@ document.addEventListener(
     "DOMContentLoaded",
     async () => {
         cargarEstado();
+
         configurarEventos();
+
         recuperarSesion();
+
         await cargarAreasDesdeSupabase();
+
         await cargarPersonasDesdeSupabase();
+
+        console.log("Servicios antes de sincronizar:", estado.servicios);
+
+        await sincronizarServiciosConSupabase();
     }
 );
